@@ -1,0 +1,28 @@
+{
+  "name": "swissdlt-faucet",
+  "version": "1.0.0",
+  "description": "An Ether faucet for the Swiss DLT blockchain.",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.appswithlove.net/swissdlt/swissdlt-faucet.git"
+  },
+  "keywords": [
+    "smartcontract",
+    "ethereum",
+    "blockchain",
+    "faucet",
+    "solidity"
+  ],
+  "author": "Pascal Marco Caversaccio",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.1.0"
+  }
+}
