@@ -10,18 +10,24 @@ contract FaucetContract is Ownable, Pausable {
     uint256 public retrievalAmount = 0.1 ether;
     uint256 public retrievalLimit = 5;
 
-    event Received(address, uint);
+    event Received(address sender, uint256 amount);
+    event Funded(address sender, uint256 amount);
+    event ChangedRetrievalParameters(uint256 newRetrievalAmount, uint256 newNumberOfTimes);
+    event contractDestroyed(string message);
 
+    // Pause the contract
     function pause() public onlyOwner {
         _pause();
     }
 
+    // Unpause the contract
     function unpause() public onlyOwner {
         _unpause();
     }
 
     mapping (address => uint256) public amountRetrieved;
 
+    // Receive funds
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
@@ -31,29 +37,33 @@ contract FaucetContract is Ownable, Pausable {
         require(newNumberOfTimes > 0, "Number of times must be positive");
         retrievalAmount = newRetrievalAmount;
         retrievalLimit = retrievalAmount.mul(newNumberOfTimes);
+        emit ChangedRetrievalParameters(newRetrievalAmount, newNumberOfTimes);
         return true;
     }
 
     // Send money to message sender
-    function sendFunds() public {
+    function sendFunds() public whenNotPaused() {
         address payable retriever = payable(msg.sender);
         amountRetrieved[retriever] = amountRetrieved[retriever].add(retrievalAmount);
         require(amountRetrieved[retriever] <= retrievalLimit, "You have reached the retrieval limit");
         require(address(this).balance >= retrievalAmount, "Reserves insufficient");
         retriever.transfer(retrievalAmount);
+        emit Funded(retriever, retrievalAmount);
     }
 
     // Send money to specific address
-    function sendToFunds(address payable retriever) public {
+    function sendToFunds(address payable retriever) public whenNotPaused() {
         amountRetrieved[retriever] = amountRetrieved[retriever].add(retrievalAmount);
         require(amountRetrieved[retriever] <= retrievalLimit, "You have reached the retrieval limit");
         require(address(this).balance >= retrievalAmount, "Reserves insufficient");
         retriever.transfer(retrievalAmount);
+        emit Funded(retriever, retrievalAmount);
     }
 
     // Destroy the faucet
     function closeFaucet(address payable payoutAddress) public onlyOwner() {
         payoutAddress.transfer(address(this).balance);
-        selfdestruct(payoutAddress); 
+        selfdestruct(payoutAddress);
+        emit contractDestroyed("Contract was successfully self-destructed");
     }
 }

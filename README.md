@@ -1,7 +1,12 @@
 # An Ether Faucet for the Swiss DLT Blockchain
 
 ## Possible Design Approach
-Let's assume that Awl is running a validator node on the Swiss DLT blockchain (this assumption is already met today). We could then deploy a simple smart contract and set the contract address to be the `coinbase` for mining rewards. After the smart contract is deployed, we could configure our validator client to award the block rewards to the contract itself. That way, the faucet contract will always have a steady supply of funds, Awl is funding the faucet automatically, and we have a clean audit trail back to the genesis block.
+Let's assume that Awl is running a validator node on the Swiss DLT blockchain (this assumption is already met today). We could then deploy a simple smart contract and set the contract address to be the `coinbase`/`etherbase` for mining/validator rewards. We can set our `etherbase` from the command line in the Geth client by running (see [here](https://geth.ethereum.org/docs/interface/mining)):
+```
+geth --miner.etherbase <'ADDRESS'> --mine 2>> geth.log
+```
+
+After the smart contract is deployed, we could configure our validator client to award the block rewards to the contract itself. That way, the faucet contract will always have a steady supply of funds, Awl is funding the faucet automatically, and we have a clean audit trail back to the genesis block.
 > A coinbase transaction is the first transaction in a block. It is a unique type of transaction that can be created by a miner. The miners use it to collect the block reward for their work and any other transaction fees collected by the miner are also sent in this transaction.
 
 This simple contract has no protection from malicious or greedy users but such precautions shouldn't be necessary on the Swiss DLT private network:
@@ -18,18 +23,24 @@ contract FaucetContract is Ownable, Pausable {
     uint256 public retrievalAmount = 0.1 ether;
     uint256 public retrievalLimit = 5;
 
-    event Received(address, uint);
+    event Received(address sender, uint256 amount);
+    event Funded(address sender, uint256 amount);
+    event ChangedRetrievalParameters(uint256 newRetrievalAmount, uint256 newNumberOfTimes);
+    event contractDestroyed(string message);
 
+    // Pause the contract
     function pause() public onlyOwner {
         _pause();
     }
 
+    // Unpause the contract
     function unpause() public onlyOwner {
         _unpause();
     }
 
     mapping (address => uint256) public amountRetrieved;
 
+    // Receive funds
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
@@ -39,30 +50,34 @@ contract FaucetContract is Ownable, Pausable {
         require(newNumberOfTimes > 0, "Number of times must be positive");
         retrievalAmount = newRetrievalAmount;
         retrievalLimit = retrievalAmount.mul(newNumberOfTimes);
+        emit ChangedRetrievalParameters(newRetrievalAmount, newNumberOfTimes);
         return true;
     }
 
     // Send money to message sender
-    function sendFunds() public {
+    function sendFunds() public whenNotPaused() {
         address payable retriever = payable(msg.sender);
         amountRetrieved[retriever] = amountRetrieved[retriever].add(retrievalAmount);
         require(amountRetrieved[retriever] <= retrievalLimit, "You have reached the retrieval limit");
         require(address(this).balance >= retrievalAmount, "Reserves insufficient");
         retriever.transfer(retrievalAmount);
+        emit Funded(retriever, retrievalAmount);
     }
 
     // Send money to specific address
-    function sendToFunds(address payable retriever) public {
+    function sendToFunds(address payable retriever) public whenNotPaused() {
         amountRetrieved[retriever] = amountRetrieved[retriever].add(retrievalAmount);
         require(amountRetrieved[retriever] <= retrievalLimit, "You have reached the retrieval limit");
         require(address(this).balance >= retrievalAmount, "Reserves insufficient");
         retriever.transfer(retrievalAmount);
+        emit Funded(retriever, retrievalAmount);
     }
 
     // Destroy the faucet
     function closeFaucet(address payable payoutAddress) public onlyOwner() {
         payoutAddress.transfer(address(this).balance);
-        selfdestruct(payoutAddress); 
+        selfdestruct(payoutAddress);
+        emit contractDestroyed("Contract was successfully self-destructed");
     }
 }
 ```
