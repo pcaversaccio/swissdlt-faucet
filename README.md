@@ -1,12 +1,11 @@
 # An Ether Faucet for the Swiss DLT Blockchain
 
 ## Possible Design Approach
-Let's assume that Awl is running a validator node on the Swiss DLT blockchain (this assumption is already met today). We could then deploy a simple smart contract and set the contract address to be the `coinbase`/`etherbase` for mining/validator rewards. We can set our `etherbase` from the command line in the Geth client by running (see [here](https://geth.ethereum.org/docs/interface/mining)):
+Let's assume that Awl is running a validator node on the Swiss DLT blockchain (this assumption is already met today). We could then deploy a simple smart contract and set the contract address to be the `coinbase`/`etherbase` for mining/validator rewards. After the smart contract is deployed, we could configure our validator Geth client to award the block rewards to the contract itself. We can set our `etherbase` from the command line in the Geth client by running (see [here](https://geth.ethereum.org/docs/interface/mining)):
 ```
 geth --miner.etherbase <'ADDRESS'> --mine 2>> geth.log
 ```
-
-After the smart contract is deployed, we could configure our validator client to award the block rewards to the contract itself. That way, the faucet contract will always have a steady supply of funds, Awl is funding the faucet automatically, and we have a clean audit trail back to the genesis block.
+That way, the faucet contract will always have a steady supply of funds, Awl is funding the faucet automatically, and we have a clean audit trail back to the genesis block.
 > A coinbase transaction is the first transaction in a block. It is a unique type of transaction that can be created by a miner. The miners use it to collect the block reward for their work and any other transaction fees collected by the miner are also sent in this transaction.
 
 This simple contract has no protection from malicious or greedy users but such precautions shouldn't be necessary on the Swiss DLT private network:
