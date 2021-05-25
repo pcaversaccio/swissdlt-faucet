@@ -5,7 +5,7 @@ Let's assume that Awl is running a validator node on the Swiss DLT blockchain (t
 > A coinbase transaction is the first transaction in a block. It is a unique type of transaction that can be created by a miner. The miners use it to collect the block reward for their work and any other transaction fees collected by the miner are also sent in this transaction.
 
 This simple contract has no protection from malicious or greedy users but such precautions shouldn't be necessary on the Swiss DLT private network:
-````
+```
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
