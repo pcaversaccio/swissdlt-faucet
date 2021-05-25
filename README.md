@@ -44,6 +44,7 @@ contract FaucetContract is Ownable, Pausable {
         emit Received(msg.sender, msg.value);
     }
 
+    // Change the retrieval parameters
     function changeRetrievalAmounts(uint256 newRetrievalAmount, uint256 newNumberOfTimes) public onlyOwner() returns(bool) {
         require(newRetrievalAmount > 0, "Retrieval amount must be positive");
         require(newNumberOfTimes > 0, "Number of times must be positive");
