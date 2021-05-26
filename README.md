@@ -81,3 +81,8 @@ contract FaucetContract is Ownable, Pausable {
     }
 }
 ```
+
+### A Note on Gas Usage
+Since the user still has to interact with a smart contract, a tiny amount of gas is needed to exist on the user's wallet. I would recommend solving this problem in a simple way:
+- When the user sets up the wallet for the first time, a small amount of ETH is allocated to the wallet by Awl (or another service provider);
+- When the available ETH drops below a certain threshold, he/she has to request additional money via the faucet before he/she can transact again. Since the entire user flow is controlled by an app, the risk of a user interacting directly with the blockchain to bypass this backup function is very low;
