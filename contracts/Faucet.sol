@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 
 contract FaucetContract is Ownable, Pausable {
     using SafeMath for uint256;
-    uint256 public retrievalAmount = 0.1 ether;
-    uint256 public retrievalLimit = 5;
+    uint256 public retrievalAmount = 1*10**17;
+    uint256 public retrievalLimit = 1*10**18;
 
     event Received(address sender, uint256 amount);
     event Funded(address sender, uint256 amount);
