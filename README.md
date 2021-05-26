@@ -90,3 +90,4 @@ Since the user still has to interact with a smart contract, a tiny amount of gas
 ### Test Deployments
 The smart contract `Faucet.sol` has been deployed to the following test networks:
 - **Rinkeby:** [0xeaBf236272A02c9587634261AF526EdacE27eb85](https://rinkeby.etherscan.io/address/0xeaBf236272A02c9587634261AF526EdacE27eb85)
+- **Kovan:** [0x627e63b8c43195Bde17186651caD87f7f1dBAfEC](https://kovan.etherscan.io/address/0x627e63b8c43195bde17186651cad87f7f1dbafec)
