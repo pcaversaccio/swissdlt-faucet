@@ -25,7 +25,6 @@ contract FaucetContract is Ownable, Pausable {
     event Received(address sender, uint256 amount);
     event Funded(address sender, uint256 amount);
     event ChangedRetrievalParameters(uint256 newRetrievalAmount, uint256 newNumberOfTimes);
-    event ContractDestroyed(string message);
 
     // Pause the contract
     function pause() public onlyOwner {
@@ -77,7 +76,6 @@ contract FaucetContract is Ownable, Pausable {
     function closeFaucet(address payable payoutAddress) public onlyOwner() {
         payoutAddress.transfer(address(this).balance);
         selfdestruct(payoutAddress);
-        emit ContractDestroyed("Contract was successfully self-destructed");
     }
 }
 ```
@@ -91,3 +89,6 @@ Since the user still has to interact with a smart contract, a tiny amount of gas
 The smart contract `Faucet.sol` has been deployed to the following test networks:
 - **Rinkeby:** [0xeaBf236272A02c9587634261AF526EdacE27eb85](https://rinkeby.etherscan.io/address/0xeaBf236272A02c9587634261AF526EdacE27eb85)
 - **Kovan:** [0x627e63b8c43195Bde17186651caD87f7f1dBAfEC](https://kovan.etherscan.io/address/0x627e63b8c43195bde17186651cad87f7f1dbafec)
+- **Goerli:** [0x53d3afE9659fa3e9bb08DFaf988B62A1C23F0b59<sup>*</sup>](https://goerli.etherscan.io/address/0x53d3afe9659fa3e9bb08dfaf988b62a1c23f0b59)
+
+<sup>*</sup> For testing purpose, this contract was self-destructed.
