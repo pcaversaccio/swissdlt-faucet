@@ -25,7 +25,7 @@ contract FaucetContract is Ownable, Pausable {
     event Received(address sender, uint256 amount);
     event Funded(address sender, uint256 amount);
     event ChangedRetrievalParameters(uint256 newRetrievalAmount, uint256 newNumberOfTimes);
-    event contractDestroyed(string message);
+    event ContractDestroyed(string message);
 
     // Pause the contract
     function pause() public onlyOwner {
@@ -77,7 +77,7 @@ contract FaucetContract is Ownable, Pausable {
     function closeFaucet(address payable payoutAddress) public onlyOwner() {
         payoutAddress.transfer(address(this).balance);
         selfdestruct(payoutAddress);
-        emit contractDestroyed("Contract was successfully self-destructed");
+        emit ContractDestroyed("Contract was successfully self-destructed");
     }
 }
 ```
